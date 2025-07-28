@@ -54,7 +54,7 @@ public class CodeService {
     public boolean verificarCodigo(String contratoId, String codigoIngresado) throws ExecutionException, InterruptedException {
         Firestore db = firestoreInitializer.getFirestore();
 
-        DocumentReference docRef = db.collection("contratos").document(contratoId);
+        DocumentReference docRef = db.collection("contracts").document(contratoId);
         String codigoGuardado = (String) docRef.get().get().get("codigoVerificacion");
 
         return codigoIngresado != null && codigoIngresado.equals(codigoGuardado);
