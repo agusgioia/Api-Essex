@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/verificacion")
-@CrossOrigin(origins = "https://essex-40828.web.app")
+@CrossOrigin(origins = {"https://essex-40828.web.app","http://localhost:3000"})
 public class VerificationController {
 
     @Autowired
