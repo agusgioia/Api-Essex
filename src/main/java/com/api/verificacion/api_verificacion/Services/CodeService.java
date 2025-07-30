@@ -43,7 +43,7 @@ public class CodeService {
             docRef.set(data, SetOptions.merge()).get();
 
             emailService.enviarCodigo(email, codigo, contratoId);
-            //smsService.enviarSms(telefono, codigo);
+            smsService.enviarSms(telefono, codigo);
             return codigo;
         }catch (Exception e){
             System.out.println("Error: "+e.getMessage());
