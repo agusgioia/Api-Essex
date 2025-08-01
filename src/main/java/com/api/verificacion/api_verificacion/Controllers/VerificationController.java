@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/verificacion")
-@CrossOrigin(origins = {"https://essex-40828.web.app","http://localhost:3000"})
+@CrossOrigin(origins = {"https://essex-40828.web.app","http://localhost:3000","http://179.43.117.6:3000"})
 public class VerificationController {
 
     @Autowired
@@ -26,7 +26,7 @@ public class VerificationController {
     public ResponseEntity<String> completarContrato(
             @PathVariable("email") String email,@PathVariable("idContrato") String idContrato){
         try{
-            String link = "https://essex-40828.web.app/sellers/New?id=" + idContrato + "&mode=usuario";
+            String link = "https://179.43.117.6/sellers/New?id=" + idContrato + "&mode=usuario";
             emailService.enviarLink(link,email);
             return ResponseEntity.ok("Link generado correctamente");
         } catch (Exception e) {
