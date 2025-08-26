@@ -1,6 +1,7 @@
 package com.api.verificacion.api_verificacion.Services;
 
 import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.SetOptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,17 +34,18 @@ public class CodeService {
             Firestore db = firestoreInitializer.getFirestore();
 
             String codigo = generarCodigoVerificacion();
+            long duracionHoras = 72;
+            Date tiempoLimite = new Date(System.currentTimeMillis() + duracionHoras * 60 * 60 * 1000);
 
             Map<String, Object> data = new HashMap<>();
             data.put("codigoVerificacion", codigo);
             data.put("verificado", false);
-            data.put("tiempoLimite", new Date());
+            data.put("tiempoLimite", tiempoLimite);
 
             DocumentReference docRef = db.collection("contracts").document(contratoId);
             docRef.set(data, SetOptions.merge()).get();
 
             emailService.enviarCodigo(email, codigo, contratoId);
-            smsService.enviarSms(telefono, codigo);
             return codigo;
         }catch (Exception e){
             System.out.println("Error: "+e.getMessage());
@@ -53,10 +55,21 @@ public class CodeService {
 
     public boolean verificarCodigo(String contratoId, String codigoIngresado) throws ExecutionException, InterruptedException {
         Firestore db = firestoreInitializer.getFirestore();
-
         DocumentReference docRef = db.collection("contracts").document(contratoId);
-        String codigoGuardado = (String) docRef.get().get().get("codigoVerificacion");
-
-        return codigoIngresado != null && codigoIngresado.equals(codigoGuardado);
+        DocumentSnapshot snapshot = docRef.get().get();
+        if (!snapshot.exists()) {
+            return false;
+        }
+        String codigoGuardado = snapshot.getString("codigoVerificacion");
+        Date tiempoLimite = snapshot.getDate("tiempoLimite");
+        if (codigoIngresado == null || codigoGuardado == null || tiempoLimite == null) {
+            return false;
+        }
+        Date ahora = new Date();
+        if (!codigoIngresado.equals(codigoGuardado)) {
+            return false;
+        }
+        return !ahora.after(tiempoLimite); // vencido
     }
+
 }
